@@ -1,0 +1,18 @@
+_format_version: "1.1"
+
+services:
+  - name: service-001
+    url: http://service-001.test:5000
+    routes:
+      - name: service-001-route
+        paths:
+          - /service-001
+        strip_path: true
+
+  - name: service-002
+    url: http://service-002.test:5000
+    routes:
+      - name: service-002-route
+        paths:
+          - /service-002
+        strip_path: true

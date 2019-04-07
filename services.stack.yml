@@ -1,0 +1,38 @@
+version: "3"
+
+networks:
+  play-kong-net:
+    external: true
+
+services:
+  service-001:
+    image: play_kong:latest
+    hostname: service-001.test
+    ports:
+      - "5001:5000"
+    environment:
+      - FLASK_APP=/app/app.py
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_RUN_PORT=5000
+    deploy:
+      replicas: 1
+    networks:
+      play-kong-net:
+        aliases:
+          - service-001.test
+
+  service-002:
+    image: play_kong:latest
+    hostname: service-002.test
+    ports:
+      - "5002:5000"
+    environment:
+      - FLASK_APP=/app/app.py
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_RUN_PORT=5000
+    deploy:
+      replicas: 1
+    networks:
+      play-kong-net:
+        aliases:
+          - service-002.test
