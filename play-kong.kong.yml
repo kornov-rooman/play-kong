@@ -1,6 +1,15 @@
 _format_version: "1.1"
 
 services:
+  - name: admin-api
+    host: localhost
+    port: 8001
+    routes:
+      - name: admin-api
+        paths:
+          - /admin-api
+        strip_path: true
+
   - name: service-001
     url: http://service-001.test:5000
     routes:

@@ -7,24 +7,53 @@ networks:
 services:
   kong:
     image: kong:latest
+    hostname: kong
+    #
+    environment:
+      KONG_DATABASE: 'off'
+      KONG_DECLARATIVE_CONFIG: /etc/kong/play-kong.kong.yml
+      #
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      #
+      # 0.0.0.0:8001, 0.0.0.0:8444 ssl
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_PROXY_LISTEN_SSL: 0.0.0.0:8443
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+    volumes:
+      - ./play-kong.kong.yml:/etc/kong/play-kong.kong.yml
+    #
+    restart: always
     deploy:
       replicas: 1
-    environment:
-      - KONG_DATABASE=off
-      - KONG_DECLARATIVE_CONFIG=/etc/kong/play-kong.kong.yml
-      #
-      - KONG_PROXY_ACCESS_LOG=/dev/stdout
-      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
-      - KONG_PROXY_ERROR_LOG=/dev/stderr
-      - KONG_ADMIN_ERROR_LOG=/dev/stderr
-      #
-      - KONG_ADMIN_LISTEN=0.0.0.0:8001, 0.0.0.0:8444 ssl
+    #
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://kong:8001"]
+      interval: 5s
+      timeout: 2s
+      retries: 15
     ports:
       - "8000:8000"
       - "8443:8443"
       - "8001:8001"
       - "8444:8444"
+    networks:
+      - play-kong-net
+
+  konga:
+    image: pantsel/konga:next
+    hostname: konga
+    deploy:
+      replicas: 1
+    restart: always
+    environment:
+      # https://github.com/pantsel/konga#environment-variables
+      NODE_ENV: production
     volumes:
-      - ./play-kong.kong.yml:/etc/kong/play-kong.kong.yml
+      - ./data/kongadata:/app/kongadata
+    ports:
+      - "1337:1337"
     networks:
       - play-kong-net
